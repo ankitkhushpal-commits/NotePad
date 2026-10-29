@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SharedPad Notes</title>
+<meta name="description" content="SharedPad Notes: a private, offline notepad with themes and smart typing.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f2a44">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SharedPad">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#efe6d2;--paper:#fbf6ea;--card:#fffdf6;--ink:#1f2a44;--muted:#7a7566;--line:#dccfae;--rule:#e9dfc6;--accent:#d9482b;--hl:#ffe27a;--shadow:0 2px 0 rgba(31,42,68,.08),0 8px 18px rgba(31,42,68,.10);--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--edfont:var(--serif)}
+:root[data-mode="dark"]{--bg:#10121a;--paper:#1b1e2b;--card:#232739;--ink:#ebe7da;--muted:#9a98a6;--line:#363b52;--rule:#272b3d;--accent:#ff8a65;--hl:#6b5a12;--shadow:0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.35)}
+:root[data-pal="ocean"]{--bg:#dcecf4;--paper:#f4fafd;--card:#fff;--ink:#12344d;--muted:#5d7a8c;--line:#b7d3e2;--rule:#dcebf3;--accent:#0f87c9}
+:root[data-pal="forest"]{--bg:#dfe8d6;--paper:#f6f9ef;--card:#fff;--ink:#22361f;--muted:#6b7d60;--line:#bccfae;--rule:#e0ebd3;--accent:#3f8f3a}
+:root[data-pal="rose"]{--bg:#f6dfe3;--paper:#fff6f6;--card:#fff;--ink:#4a1f2c;--muted:#8c6670;--line:#ebc0c9;--rule:#f8e3e6;--accent:#d6336c}
+:root[data-pal="lavender"]{--bg:#e6e0f3;--paper:#f8f5ff;--card:#fff;--ink:#2e2552;--muted:#756c99;--line:#cfc5ea;--rule:#ebe6f8;--accent:#7048e8}
+:root[data-pal="sunset"]{--bg:#fbe1cc;--paper:#fff7ef;--card:#fff;--ink:#4a2410;--muted:#8f6a52;--line:#f0c6a5;--rule:#fbe8d6;--accent:#f06a1a}
+:root[data-pal="mono"]{--bg:#e4e4e4;--paper:#fafafa;--card:#fff;--ink:#111;--muted:#777;--line:#ccc;--rule:#eee;--accent:#111}
+:root[data-mode="dark"][data-pal="ocean"]{--bg:#0b1620;--paper:#12232f;--card:#182f3e;--ink:#e3f1f9;--muted:#8fb0c2;--line:#2a4759;--rule:#1b3140;--accent:#4cc3ff}
+:root[data-mode="dark"][data-pal="forest"]{--bg:#0f1a12;--paper:#17261a;--card:#1e3022;--ink:#e4f0dc;--muted:#93a98b;--line:#2f4a34;--rule:#1f3524;--accent:#7ddc6f}
+:root[data-mode="dark"][data-pal="rose"]{--bg:#1d0f15;--paper:#2a1620;--card:#351c28;--ink:#fbe6ec;--muted:#c496a4;--line:#5a2c3d;--rule:#331a25;--accent:#ff7aa8}
+:root[data-mode="dark"][data-pal="lavender"]{--bg:#14102a;--paper:#1e1940;--card:#272152;--ink:#ece8ff;--muted:#a59fd0;--line:#3d3570;--rule:#2a2450;--accent:#a78bfa}
+:root[data-mode="dark"][data-pal="sunset"]{--bg:#1f1008;--paper:#2d1a0f;--card:#3a2214;--ink:#ffeadb;--muted:#c9a58c;--line:#5c3a22;--rule:#38210f;--accent:#ff9a4d}
+:root[data-mode="dark"][data-pal="mono"]{--bg:#0a0a0a;--paper:#151515;--card:#1d1d1d;--ink:#f2f2f2;--muted:#999;--line:#333;--rule:#222;--accent:#fff}
+
+:root[data-font="hand"]{--edfont:"Segoe Print","Bradley Hand","Chalkboard SE","Comic Sans MS",cursive}
+:root[data-font="sans"]{--edfont:var(--sans)}
+:root[data-font="mono"]{--edfont:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg) radial-gradient(color-mix(in srgb,var(--accent) 16%,transparent) 2px,transparent 2.5px) 0 0/28px 28px;transition:background-color .3s;color:var(--ink);font:15px/1.5 var(--sans);padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+#app{display:flex;height:100%;gap:14px;padding:14px;max-width:1400px;margin:auto}
+#side{width:340px;flex:none;display:flex;flex-direction:column;min-width:0;position:relative}
+#main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--paper);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+#main:before{content:"";position:absolute;left:46px;top:0;bottom:0;width:2px;background:var(--accent);opacity:.35;pointer-events:none;z-index:1}
+.brand{display:flex;align-items:center;gap:8px;padding:2px 4px 10px}
+.brand h1{font:italic 700 27px var(--serif);margin:0;letter-spacing:-.5px;flex:1}
+.brand h1 span{color:var(--accent)}
+button,select,input{font:inherit;color:var(--ink)}
+button{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 10px;cursor:pointer;transition:transform .1s,border-color .15s}
+button:hover{border-color:var(--accent)}button:active{transform:scale(.96)}
+button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pri{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+input,select{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:6px 10px;min-width:0}
+.row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+#q{flex:1}
+#list{flex:1;overflow:auto;padding:6px 4px 70px;display:flex;flex-direction:column;gap:12px}
+.item{background:var(--card);border-radius:4px 4px 10px 10px;padding:16px 14px 10px;cursor:pointer;box-shadow:var(--shadow);position:relative;border-top:10px solid var(--line);transition:transform .15s}
+.item:nth-child(odd){transform:rotate(-.6deg)}.item:nth-child(even){transform:rotate(.5deg)}
+.item:hover,.item.sel{transform:rotate(0) translateY(-2px)}
+.item.sel{outline:2px solid var(--accent)}
+.item b{display:block;font:700 17px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item p{margin:2px 0 6px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px}
+.item small{color:var(--muted);font-size:11px}
+.tag{display:inline-block;background:var(--bg);border-radius:10px;padding:0 8px;font-size:11px;margin-right:3px}
+.pinmark{position:absolute;right:10px;top:-2px;font-size:16px}
+#tb{display:flex;gap:5px;padding:10px 12px 10px 60px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--card);position:relative;z-index:2}
+#title{font:700 28px var(--serif);border:0;background:transparent;padding:14px 16px 2px 60px;width:100%;outline:0}
+#tags{border:0;background:transparent;padding:0 16px 8px 60px;width:100%;outline:0;font-size:13px;color:var(--muted)}
+#ed{flex:1;overflow:auto;padding:0 20px 60px 60px;outline:0;font:var(--fs,17px)/32px var(--edfont);background:repeating-linear-gradient(transparent 0 31px,var(--rule) 31px 32px) local;background-position:0 -1px}
+#ed:empty:before{content:"Start writing…";color:var(--muted)}
+#ed mark,#ed span[style*="background"]{color:inherit;border-radius:3px}
+#ed h2{font-size:1.3em;line-height:32px;margin:0}
+#ed input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);vertical-align:-2px;margin-right:6px}
+#ed ul,#ed ol{margin:0;padding-left:26px}
+#bt{display:flex;gap:6px;padding:8px 12px 8px 60px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);background:var(--card);position:relative;z-index:2}
+#foot{display:flex;justify-content:space-between;gap:8px;padding:5px 14px 5px 60px;color:var(--muted);font-size:12px;flex-wrap:wrap;background:var(--card);position:relative;z-index:2}
+.dots{display:flex;gap:5px}.dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);padding:0}
+.dot.cur{outline:2px solid var(--ink);outline-offset:1px}
+.empty{margin:auto;color:var(--muted);text-align:center;font:italic 18px var(--serif);padding:30px}
+#fab{display:none;position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;font-size:28px;padding:0;box-shadow:var(--shadow);z-index:5}
+#back{display:none}
+@media(max-width:760px){
+ #app{padding:8px;gap:0}#side{width:100%}#main{display:none;border-radius:10px}
+ #app.open #side{display:none}#app.open #main{display:flex}
+ #back{display:inline-block}#fab{display:block}#app.open ~ #fab{display:none}
+ #tb,#bt,#foot{padding-left:16px}#title,#tags,#ed{padding-left:20px}#main:before{display:none}
+ #newtop{display:none}
+}
+.brand h1{background:linear-gradient(90deg,var(--ink),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand h1 span{color:inherit}
+:root[data-paper="grid"] #ed{background:linear-gradient(var(--rule) 1px,transparent 1px) 0 -1px/100% 32px local,linear-gradient(90deg,var(--rule) 1px,transparent 1px) 0 0/32px 100% local}
+:root[data-paper="dots"] #ed{background:radial-gradient(var(--line) 1.5px,transparent 1.7px) 0 0/32px 32px local}
+:root[data-paper="plain"] #ed{background:none}
+#main{border:1px solid var(--line)}
+#main:after{content:"";position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 26px 26px;border-color:transparent transparent var(--bg) transparent;z-index:3;pointer-events:none}
+#title{border-bottom:2px dashed var(--line);margin-bottom:6px}
+#ed blockquote{border-left:4px solid var(--accent);margin:0;padding-left:12px;color:var(--muted);font-style:italic}
+#ed hr{border:0;border-top:2px dashed var(--accent);opacity:.5;margin:15px 0}
+#ed ::selection,#ed::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+.item{border-top-width:10px;border-top-style:solid}
+.item:hover{box-shadow:0 12px 26px rgba(0,0,0,.18)}
+#set{position:absolute;top:50px;left:0;right:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 14px 14px;box-shadow:var(--shadow);z-index:30}
+#set[hidden]{display:none}
+#set h4{margin:12px 0 5px;font:600 11px var(--sans);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.seg,#sPal{display:flex;gap:6px;flex-wrap:wrap}
+.swb{width:32px;height:32px;border-radius:50%;padding:0;border:3px solid var(--card);outline:2px solid var(--line)}
+.swb.cur{outline-color:var(--ink)}
+#emo{padding:4px 6px}
+.spark{position:fixed;pointer-events:none;animation:sp .7s ease-out forwards;font-size:18px;z-index:99}
+@keyframes sp{to{transform:translateY(-34px) scale(1.7);opacity:0}}
+#fmod{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:60;padding:12px}
+#fmod[hidden]{display:none}
+#fpan{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:var(--shadow);width:min(660px,100%);max-height:92%;overflow:auto;padding:16px;border:1px solid var(--line)}
+.fhd{display:flex;align-items:center;justify-content:space-between}
+.fhd h3{margin:0;font:700 22px var(--serif)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.fg input{width:100%}
+.fnote{font-size:12px;color:var(--muted);margin:4px 0}
+#fpan summary{cursor:pointer;color:var(--accent);margin-top:8px}
+#drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;margin:12px 0;color:var(--muted)}
+#drop.over{border-color:var(--accent);background:var(--card)}
+.frow{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;flex-wrap:wrap}
+.frow .nm{flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow small{color:var(--muted)}
+.btn{display:inline-block;border-radius:9px;padding:5px 10px;cursor:pointer}
+#fmsg{min-height:20px;font-size:13px;color:var(--accent);margin-bottom:6px}
+@media print{#fmod{display:none!important}#side,#tb,#bt,#foot{display:none}#main{display:flex!important;box-shadow:none}}
+</style></head><body>
+<div id="app">
+<div id="side">
+ <div class="brand"><h1>Shared<span>Pad</span></h1><button id="inst" style="display:none" title="Install app">⬇ Install</button><button id="theme" title="Auto / light / dark">🌓</button><button id="filesbtn" title="Shared files">📁</button><button id="gear" title="Themes and style">🎨</button></div>
+ <div id="set" hidden><h4>Mode</h4><div class="seg" id="sMode"></div><h4>Colour theme</h4><div id="sPal"></div><h4>Paper</h4><div class="seg" id="sPaper"></div><h4>Writing font</h4><div class="seg" id="sFont"></div><h4 style="text-transform:none;letter-spacing:0;font-weight:400">Tips: type “- ”, “1. ”, “[] ”, “# ” or “&gt; ” to auto-format. Type /date or /time then space. Enter continues lists and tasks.</h4></div>
+ <div class="row"><input id="q" type="search" placeholder="Search notes…"><button class="pri" id="newtop">＋ New</button></div>
+ <div class="row"><select id="view"><option value="all">All</option><option value="pin">Pinned</option><option value="trash">Trash</option></select>
+  <select id="sort"><option value="upd">Recent</option><option value="cre">Created</option><option value="ttl">A–Z</option></select>
+  <select id="tagf"><option value="">All tags</option></select></div>
+ <div id="list"></div>
+ <div class="row" style="margin:8px 0 0;align-items:center"><button id="exp">Backup</button><button id="imp">Restore</button><span id="cnt" style="color:var(--muted);font-size:12px;margin-left:auto"></span></div>
+</div>
+<div id="main"></div>
+</div>
+<div id="fmod" hidden><div id="fpan">
+ <div class="fhd"><h3>📁 Shared files</h3><button id="fclose">✕</button></div>
+ <p class="fnote">Upload any file type and download it from any device. Files are stored in your GitHub repo’s <b>files</b> folder.</p>
+ <details id="conn"><summary>Connection (GitHub)</summary>
+  <div class="fg"><input id="gOwner" placeholder="GitHub username"><input id="gRepo" placeholder="Repository name"><input id="gBranch" placeholder="Branch (main)"><input id="gToken" type="password" placeholder="Token (only to upload/delete)"></div>
+  <button class="pri" id="gSave">Save &amp; refresh</button>
+  <p class="fnote">Anyone can download if the repo is public. Uploading or deleting needs a fine-grained token with Contents: read and write for this repo only. The token stays in this browser and is never shared.</p></details>
+ <div id="drop">Drop files here or <label class="btn pri">Choose files<input id="fpick" type="file" multiple hidden></label><br><small>Up to 50 MB each</small></div>
+ <div id="fmsg"></div><div id="flist"></div></div></div>
+<button class="pri" id="fab" aria-label="New note">＋</button>
+<script>
+const KEY="notepad.v1";let S={notes:[],mode:"auto",pal:"ink",paper:"ruled",font:"serif",fs:17},cur=null,t,dp=null;
+const COL=["","#e5604d","#f0a030","#e8cf3a","#5fae6b","#4a90d9","#a066c4"];
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const txt=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent||""};
+const fmt=ts=>new Date(ts).toLocaleString([],{dateStyle:"medium",timeStyle:"short"});
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=Object.assign(S,JSON.parse(r));if(S.theme){S.mode=S.theme;delete S.theme}}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function applyTheme(){const r=document.documentElement,dark=S.mode==="dark"||(S.mode==="auto"&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.mode=dark?"dark":"light";r.dataset.pal=S.pal;r.dataset.paper=S.paper;r.dataset.font=S.font;r.style.setProperty("--fs",S.fs+"px");const m=document.querySelector("meta[name=theme-color]"),c=getComputedStyle(r).getPropertyValue("--paper").trim();if(m&&c)m.content=c}
+const get=()=>S.notes.find(n=>n.id===cur);
+function renderList(){
+ const q=$("q").value.toLowerCase(),v=$("view").value,s=$("sort").value,tf=$("tagf").value;
+ const all=new Set();S.notes.forEach(n=>!n.trash&&n.tags.forEach(x=>all.add(x)));
+ $("tagf").innerHTML='<option value="">All tags</option>'+[...all].map(x=>`<option${x===tf?" selected":""}>${esc(x)}</option>`).join("");
+ let a=S.notes.filter(n=>v==="trash"?n.trash:!n.trash&&(v!=="pin"||n.pin));
+ if(tf)a=a.filter(n=>n.tags.includes(tf));
+ if(q)a=a.filter(n=>(n.title+" "+txt(n.body)+" "+n.tags.join(" ")).toLowerCase().includes(q));
+ a.sort((x,y)=>(y.pin-x.pin)||(s==="ttl"?x.title.localeCompare(y.title):s==="cre"?y.cre-x.cre:y.upd-x.upd));
+ $("list").innerHTML=a.length?"":'<p class="empty">Nothing here yet.<br>Tap ＋ to start a note.</p>';
+ a.forEach(n=>{const d=document.createElement("div");d.className="item"+(n.id===cur?" sel":"");if(n.color)d.style.borderTopColor=n.color;
+  d.innerHTML=`${n.pin?'<span class="pinmark">📌</span>':""}<b>${esc(n.title||"Untitled")}</b><p>${esc(txt(n.body).slice(0,120)||"No content")}</p>${n.tags.map(x=>`<span class="tag">${esc(x)}</span>`).join("")}<small>${fmt(n.upd)}</small>`;
+  d.onclick=()=>{cur=n.id;$("app").classList.add("open");renderList();renderMain()};$("list").appendChild(d)});
+ $("cnt").textContent=S.notes.filter(n=>!n.trash).length+" notes";
+}
+function renderMain(){
+ const n=get(),m=$("main");
+ if(!n){m.innerHTML='<p class="empty">Pick a note, or start a fresh page ✍️</p>';return}
+ m.innerHTML=`<div id="tb"><button id="back">← Notes</button>
+ <button data-c="bold"><b>B</b></button><button data-c="italic"><i>I</i></button><button data-c="underline"><u>U</u></button><button data-c="strikeThrough"><s>S</s></button>
+ <button data-c="hiliteColor" data-v="#ffe27a">🖍</button><button data-c="formatBlock" data-v="h2">H</button><button data-c="insertUnorderedList">• List</button><button data-c="insertOrderedList">1. List</button><button id="chk">☑ Task</button><button data-c="formatBlock" data-v="blockquote">❝</button><button data-c="insertHorizontalRule">―</button><select id="emo"><option value="">😊</option><option>⭐</option><option>❤️</option><option>✅</option><option>💡</option><option>🔥</option><option>🎯</option><option>📌</option><option>🎉</option><option>✨</option><option>🌈</option></select><button data-c="removeFormat">Clear</button><button id="fm">A−</button><button id="fp">A+</button></div>
+ <input id="title" placeholder="Untitled" value="${esc(n.title)}">
+ <input id="tags" placeholder="tags, separated, by commas" value="${esc(n.tags.join(", "))}">
+ <div id="ed" contenteditable="true" spellcheck="true"></div>
+ <div id="bt"><div class="dots" id="dots"></div><button id="pin" class="${n.pin?"on":""}">📌 Pin</button><button id="dup">Duplicate</button><button id="cp">Copy</button><button id="pr">Print</button>
+ ${n.trash?'<button id="rest">Restore</button><button id="del">Delete forever</button>':'<button id="del">🗑 Trash</button>'}</div>
+ <div id="foot"><span id="wc"></span><span id="st">Saved</span><span>Edited ${fmt(n.upd)}</span></div>`;
+ const ed=$("ed");ed.innerHTML=n.body;
+ COL.forEach(c=>{const b=document.createElement("button");b.className="dot"+(c===(n.color||"")?" cur":"");b.style.background=c||"transparent";b.title="Colour label";b.onclick=()=>{n.color=c;touch(n);renderMain()};$("dots").appendChild(b)});
+ m.querySelectorAll("[data-c]").forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=()=>{ed.focus();document.execCommand(b.dataset.c,false,b.dataset.v||null);sync()}});
+ $("chk").onmousedown=e=>e.preventDefault();
+ $("chk").onclick=()=>{ed.focus();document.execCommand("insertHTML",false,'<div><input type="checkbox">&nbsp;</div>');sync()};
+ ed.addEventListener("change",e=>{if(e.target.type==="checkbox"){e.target.toggleAttribute("checked",e.target.checked);if(e.target.checked)sparkle(e.target);sync()}});
+ ed.oninput=sync;
+ ed.onkeydown=editKeys;
+ $("title").oninput=e=>{n.title=e.target.value;queue(n)};
+ $("tags").oninput=e=>{n.tags=e.target.value.split(",").map(x=>x.trim()).filter(Boolean);queue(n)};
+ $("title").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();$("tags").focus()}};$("tags").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ed.focus()}};
+ $("emo").onchange=e=>{if(e.target.value){ed.focus();document.execCommand("insertText",false,e.target.value+" ");e.target.selectedIndex=0;sync()}};
+ $("fm").onclick=()=>{S.fs=Math.max(13,S.fs-2);applyTheme();save()};$("fp").onclick=()=>{S.fs=Math.min(30,S.fs+2);applyTheme();save()};
+ $("pin").onclick=()=>{n.pin=!n.pin;touch(n);renderMain()};
+ $("dup").onclick=()=>{const c={...n,tags:[...n.tags],id:uid(),title:n.title+" (copy)",cre:Date.now(),upd:Date.now(),pin:false};S.notes.push(c);save();cur=c.id;renderList();renderMain()};
+ $("cp").onclick=()=>{navigator.clipboard?navigator.clipboard.writeText(ed.innerText).then(()=>flash("Copied"),()=>flash("Copy blocked")):flash("Copy blocked")};
+ $("pr").onclick=()=>window.print();
+ $("del").onclick=()=>{if(n.trash){if(!confirm("Delete this note permanently?"))return;S.notes=S.notes.filter(x=>x!==n)}else n.trash=true;save();cur=null;$("app").classList.remove("open");renderList();renderMain()};
+ if($("rest"))$("rest").onclick=()=>{n.trash=false;touch(n);renderMain()};
+ $("back").onclick=()=>$("app").classList.remove("open");
+ count();
+}
+function count(){const e=$("ed");if(!e)return;const s=e.innerText.trim(),w=s?s.split(/\s+/).length:0;$("wc").textContent=w+" words · "+s.length+" chars · "+Math.max(1,Math.ceil(w/200))+" min read"}
+function flash(m){const s=$("st");if(s){s.textContent=m;setTimeout(()=>{const x=$("st");x&&(x.textContent="Saved")},1200)}}
+function sync(){const n=get();if(!n)return;n.body=$("ed").innerHTML;count();queue(n)}
+function queue(n){const s=$("st");s&&(s.textContent="Saving…");clearTimeout(t);t=setTimeout(()=>{n.upd=Date.now();save();flash("Saved");renderList()},400)}
+function touch(n){n.upd=Date.now();save();renderList()}
+function newNote(){const n={id:uid(),title:"",body:"",tags:[],color:"",pin:false,trash:false,cre:Date.now(),upd:Date.now()};S.notes.push(n);save();cur=n.id;$("app").classList.add("open");renderList();renderMain();$("title").focus()}
+$("newtop").onclick=newNote;$("fab").onclick=newNote;
+["q","view","sort","tagf"].forEach(i=>$(i).oninput=renderList);
+$("theme").onclick=()=>{S.mode=({auto:"light",light:"dark",dark:"auto"})[S.mode]||"auto";applyTheme();save();buildSettings()};
+$("exp").onclick=()=>{const j=JSON.stringify(S);navigator.clipboard?navigator.clipboard.writeText(j).then(()=>alert("Backup copied. Paste it somewhere safe."),()=>prompt("Copy your backup:",j)):prompt("Copy your backup:",j)};
+$("imp").onclick=()=>{const j=prompt("Paste a backup to restore (notes are merged):");if(!j)return;try{const d=JSON.parse(j),ids=new Set(S.notes.map(n=>n.id));(d.notes||[]).forEach(n=>!ids.has(n.id)&&S.notes.push(n));save();renderList();alert("Restored")}catch(e){alert("That backup isn’t valid.")}};
+document.addEventListener("keydown",e=>{const k=e.ctrlKey||e.metaKey;if(k&&e.key==="s"){e.preventDefault();sync();save();flash("Saved")}if(k&&e.altKey&&e.key==="n"){e.preventDefault();newNote()}});
+/* Automation */
+function curBlock(){const ed=$("ed"),s=getSelection();let n=s.anchorNode;if(!n||!ed.contains(n)||n===ed)return null;while(n.parentNode!==ed)n=n.parentNode;return n}
+const isTask=n=>n&&n.nodeType===1&&n.firstElementChild&&n.firstElementChild.type==="checkbox";
+const SUB={":)":"🙂",":D":"😄","<3":"❤️","->":"→","<-":"←","=>":"⇒","(c)":"©","(tm)":"™","...":"…"};
+function setCaret(n,p){const r=document.createRange();r.setStart(n,p);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+function repl(n,off,len,v){const t=n.textContent;n.textContent=t.slice(0,off-len)+v+t.slice(off);setCaret(n,off-len+v.length);sync()}
+function editKeys(e){
+ const s=getSelection();
+ if(e.key==="Tab"){e.preventDefault();e.shiftKey?document.execCommand("outdent"):document.execCommand("insertText",false,"    ");return}
+ if(e.key==="Enter"&&!e.shiftKey){const b=curBlock();if(isTask(b)){
+  if(!b.textContent.replace(/\u00a0/g,"").trim()){e.preventDefault();b.innerHTML="<br>";sync();return}
+  setTimeout(()=>{const nb=curBlock();if(nb&&nb.nodeType===1&&!isTask(nb)){const c=document.createElement("input");c.type="checkbox";const sp=document.createTextNode("\u00a0");nb.insertBefore(sp,nb.firstChild);nb.insertBefore(c,sp);setCaret(sp,1)}sync()},0)}return}
+ if(e.key===" "&&s.rangeCount&&s.isCollapsed){const n=s.anchorNode;if(!n||n.nodeType!==3||!$("ed").contains(n))return;
+  const off=s.anchorOffset,pre=n.textContent.slice(0,off),b=curBlock();
+  if(b&&b.tagName!=="UL"&&b.tagName!=="OL"&&(b===n||b.textContent===pre)){const t=pre.trim();let cmd=null;
+   if(t==="-"||t==="*")cmd="insertUnorderedList";else if(/^\d+\.$/.test(t))cmd="insertOrderedList";else if(t==="#")cmd="h2";else if(t===">")cmd="blockquote";else if(t==="[]"||t==="[ ]")cmd="task";
+   if(cmd){e.preventDefault();n.textContent="";setCaret(n,0);
+    if(cmd==="task"){document.execCommand("formatBlock",false,"div");document.execCommand("insertHTML",false,'<input type="checkbox">&nbsp;')}
+    else if(cmd==="h2"||cmd==="blockquote")document.execCommand("formatBlock",false,cmd);else document.execCommand(cmd);
+    sync();return}}
+  const m=pre.match(/(^|\s)\/(date|time|now)$/);
+  if(m){e.preventDefault();const d=new Date(),v=m[2]==="date"?d.toLocaleDateString([],{dateStyle:"long"}):m[2]==="time"?d.toLocaleTimeString([],{timeStyle:"short"}):d.toLocaleString([],{dateStyle:"medium",timeStyle:"short"});repl(n,off,m[2].length+1,v+" ");return}
+  for(const k in SUB){if(pre.endsWith(k)){e.preventDefault();repl(n,off,k.length,SUB[k]+" ");return}}}
+}
+function sparkle(el){const s=document.createElement("span"),r=el.getBoundingClientRect();s.textContent="✨";s.className="spark";s.style.left=r.left+"px";s.style.top=r.top+"px";document.body.appendChild(s);setTimeout(()=>s.remove(),700)}
+/* Themes panel */
+const PALS=[["ink","#d9482b","Inkwell"],["ocean","#0f87c9","Ocean"],["forest","#3f8f3a","Forest"],["rose","#d6336c","Rose"],["lavender","#7048e8","Lavender"],["sunset","#f06a1a","Sunset"],["mono","#222","Mono"]];
+function seg(id,key,opts){const box=$(id);box.innerHTML="";opts.forEach(([v,l])=>{const b=document.createElement("button");b.textContent=l;b.className=S[key]===v?"on":"";b.onclick=()=>{S[key]=v;applyTheme();save();buildSettings()};box.appendChild(b)})}
+function buildSettings(){seg("sMode","mode",[["auto","Auto"],["light","☀️ Light"],["dark","🌙 Dark"]]);seg("sPaper","paper",[["ruled","Ruled"],["grid","Grid"],["dots","Dots"],["plain","Plain"]]);seg("sFont","font",[["serif","Serif"],["hand","Handwritten"],["sans","Sans"],["mono","Mono"]]);
+ const p=$("sPal");p.innerHTML="";PALS.forEach(([v,c,l])=>{const b=document.createElement("button");b.className="swb"+(S.pal===v?" cur":"");b.style.background=c;b.title=l;b.onclick=()=>{S.pal=v;applyTheme();save();buildSettings()};p.appendChild(b)})}
+$("gear").onclick=e=>{e.stopPropagation();$("set").hidden=!$("set").hidden};
+document.addEventListener("click",e=>{if(!$("set").hidden&&!$("set").contains(e.target))$("set").hidden=true});
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",applyTheme);
+/* Shared files (GitHub storage) */
+const GK="sharedpad.gh";let G={owner:"",repo:"",branch:"main",token:""},FILES=[];
+function gload(){try{Object.assign(G,JSON.parse(localStorage.getItem(GK)||"{}"))}catch(e){}
+ if(!G.owner&&/\.github\.io$/.test(location.hostname)){G.owner=location.hostname.split(".")[0];G.repo=location.pathname.split("/")[1]||G.owner+".github.io"}}
+const gsave=()=>{try{localStorage.setItem(GK,JSON.stringify(G))}catch(e){}};
+const gh=(p,o={})=>fetch("https://api.github.com/repos/"+G.owner+"/"+G.repo+p,{...o,headers:{Accept:"application/vnd.github+json",...(G.token?{Authorization:"Bearer "+G.token}:{}),...(o.headers||{})}});
+const fmsg=m=>{$("fmsg").textContent=m};
+const fsize=b=>b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(1)+" MB";
+const ficon=n=>{const e=(n.split(".").pop()||"").toLowerCase();return/^(png|jpe?g|gif|webp|svg|bmp)$/.test(e)?"🖼️":e==="pdf"?"📕":/^(mp3|wav|m4a|ogg|flac)$/.test(e)?"🎵":/^(mp4|mov|mkv|webm|avi)$/.test(e)?"🎬":/^(zip|rar|7z|tar|gz)$/.test(e)?"🗜️":/^(xls|xlsx|csv)$/.test(e)?"📊":/^(ppt|pptx)$/.test(e)?"📽️":/^(doc|docx|txt|md|rtf)$/.test(e)?"📝":"📄"};
+const pageUrl=n=>"https://"+G.owner+".github.io/"+(G.repo.toLowerCase()===(G.owner+".github.io").toLowerCase()?"":G.repo+"/")+"files/"+encodeURIComponent(n);
+async function fList(){const box=$("flist");
+ if(!G.owner||!G.repo){box.innerHTML='<p class="fnote">Open “Connection” and enter your GitHub username and repository name.</p>';return}
+ box.textContent="Loading…";
+ try{const r=await gh("/contents/files?ref="+encodeURIComponent(G.branch||"main"));
+  if(r.status===404){FILES=[]}else if(!r.ok)throw new Error(r.status);else FILES=(await r.json()).filter(x=>x.type==="file"&&x.name!==".gitkeep");
+  fRender()}catch(e){box.innerHTML='<p class="fnote">Couldn’t load files ('+esc(String(e.message))+'). Check the connection details and that the repo is public.</p>'}}
+function fRender(){const box=$("flist");box.innerHTML=FILES.length?"":'<p class="fnote">No files yet. Upload one above.</p>';
+ FILES.forEach(f=>{const d=document.createElement("div");d.className="frow";
+  d.innerHTML=`<span>${ficon(f.name)}</span><span class="nm" title="${esc(f.name)}">${esc(f.name)} <small>${fsize(f.size)}</small></span>`;
+  const add=(l,fn,cls)=>{const b=document.createElement("button");b.textContent=l;if(cls)b.className=cls;b.onclick=fn;d.appendChild(b)};
+  add("Download",()=>fDown(f),"pri");
+  add("Copy link",()=>{const u=pageUrl(f.name);navigator.clipboard?navigator.clipboard.writeText(u).then(()=>fmsg("Link copied. It can take a minute to go live after upload."),()=>prompt("Copy link:",u)):prompt("Copy link:",u)});
+  if(navigator.share)add("Share",()=>navigator.share({title:f.name,url:pageUrl(f.name)}).catch(()=>{}));
+  if(G.token)add("Delete",()=>fDel(f));
+  box.appendChild(d)})}
+async function fDown(f){fmsg("Preparing "+f.name+"…");try{const r=await gh("/contents/files/"+encodeURIComponent(f.name)+"?ref="+encodeURIComponent(G.branch||"main"),{headers:{Accept:"application/vnd.github.raw+json"}});if(!r.ok)throw 0;const b=await r.blob(),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);fmsg("")}catch(e){fmsg("Download failed. Try again.")}}
+async function fDel(f){if(!confirm("Delete "+f.name+" for everyone?"))return;try{const r=await gh("/contents/files/"+encodeURIComponent(f.name),{method:"DELETE",body:JSON.stringify({message:"Delete "+f.name+" via SharedPad",sha:f.sha,branch:G.branch||"main"})});if(!r.ok)throw 0;fmsg("Deleted");fList()}catch(e){fmsg("Delete failed. Check your token.")}}
+const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f)});
+async function fUp(list){
+ if(!G.token){fmsg("Add your GitHub token in “Connection” to upload.");$("conn").open=true;return}
+ for(const file of list){
+  if(file.size>50*1048576){fmsg(file.name+" is over 50 MB.");continue}
+  let name=file.name.replace(/[^\w.\- ()]/g,"_");if(FILES.some(x=>x.name===name))name=Date.now()+"-"+name;
+  fmsg("Uploading "+name+"…");
+  try{const r=await gh("/contents/files/"+encodeURIComponent(name),{method:"PUT",body:JSON.stringify({message:"Add "+name+" via SharedPad",content:await b64(file),branch:G.branch||"main"})});
+   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||r.status)}}
+  catch(e){fmsg("Upload failed: "+e.message);return}}
+ fmsg("Upload complete ✓");fList()}
+$("filesbtn").onclick=()=>{$("gOwner").value=G.owner;$("gRepo").value=G.repo;$("gBranch").value=G.branch;$("gToken").value=G.token;$("fmod").hidden=false;fmsg("");fList()};
+$("fclose").onclick=()=>$("fmod").hidden=true;
+$("fmod").onclick=e=>{if(e.target===$("fmod"))$("fmod").hidden=true};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("fmod").hidden=true});
+$("gSave").onclick=()=>{G.owner=$("gOwner").value.trim();G.repo=$("gRepo").value.trim();G.branch=$("gBranch").value.trim()||"main";G.token=$("gToken").value.trim();gsave();fList()};
+$("fpick").onchange=e=>{fUp([...e.target.files]);e.target.value=""};
+const dz=$("drop");["dragenter","dragover"].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add("over")}));
+["dragleave","drop"].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove("over")}));
+dz.addEventListener("drop",e=>fUp([...e.dataTransfer.files]));
+/* Install as app */
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("inst").style.display=""});
+window.addEventListener("appinstalled",()=>{$("inst").style.display="none"});
+$("inst").onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$("inst").style.display="none"}};
+if(/iphone|ipad/i.test(navigator.userAgent)&&!navigator.standalone){$("inst").style.display="";$("inst").onclick=()=>alert("On iPhone/iPad: tap Share, then “Add to Home Screen”.")}
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+load();gload();applyTheme();buildSettings();renderList();renderMain();
+</script></body></html>
